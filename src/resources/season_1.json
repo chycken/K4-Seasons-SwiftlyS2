@@ -1,0 +1,99 @@
+{
+  "seasonName": "Season 1",
+  "durationDays": 90,
+  "rewards": {
+    "1": {
+      "name": "Beginner Badge + Welcome Bonus",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_givemoney {name} 1000",
+        "// css_credits {name} 5"
+      ],
+      "permissions": [],
+      "battlePassOnly": false
+    },
+    "5": {
+      "name": "Custom Chat Tag + XP Boost",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_tag_set {name} [VIP]",
+        "// css_xp_boost {name} 1.5"
+      ],
+      "permissions": [],
+      "battlePassOnly": false
+    },
+    "10": {
+      "name": "Exclusive Spray + Name Color",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_spray_unlock {name} exclusive_spray",
+        "// css_namecolor {name} #FFD700"
+      ],
+      "permissions": [],
+      "battlePassOnly": false
+    },
+    "15": {
+      "name": "Premium Weapon Skin Pack",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_skin_give {name} ak47_premium",
+        "// css_skin_give {name} m4a4_elite"
+      ],
+      "permissions": [],
+      "battlePassOnly": false
+    },
+    "20": {
+      "name": "Master Title + Special Effects",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_title_set {name} Master",
+        "// css_effects_enable {name} kill_effect"
+      ],
+      "permissions": [],
+      "battlePassOnly": false
+    },
+    "30": {
+      "name": "Bronze Battle Pass: VIP Chat + Kill Effects",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_vip_add {name} 30",
+        "// css_killeffect {name} bronze_particle"
+      ],
+      "permissions": [],
+      "battlePassOnly": true
+    },
+    "50": {
+      "name": "Silver Battle Pass: Custom Player Model + Trail",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_model_set {name} vip_silver",
+        "// css_trail_enable {name} silver_trail"
+      ],
+      "permissions": [],
+      "battlePassOnly": true
+    },
+    "75": {
+      "name": "Gold Battle Pass: Legendary Knife Skin + Particle",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_knife_give {name} legendary_karambit",
+        "// css_particle {name} golden_glow"
+      ],
+      "permissions": [],
+      "battlePassOnly": true
+    },
+    "100": {
+      "name": "Ultimate VIP: Full Perk Package + Exclusive Access",
+      "commands": [
+        "// Insert your commands here - Examples:",
+        "// css_vip_add {name} 0",
+        "// css_perks_unlock_all {name}",
+        "// css_access_grant {name} vip_lounge"
+      ],
+      "permissions": [
+        "k4-seasons.vip"
+      ],
+      "battlePassOnly": true
+    }
+  }
+}

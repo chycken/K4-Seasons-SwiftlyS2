@@ -1,0 +1,230 @@
+[
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Map": "de_dust2",
+    "Type": "Personal",
+    "Name": "Die 3 times on Dust2",
+    "AmountToComplete": 3,
+    "RewardExperience": 1500,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Attacker",
+    "EventProperties": {
+      "Weapon": "ak47",
+      "Headshot": true
+    },
+    "Type": "Personal",
+    "Name": "Kill 10 with AK47 headshots",
+    "AmountToComplete": 10,
+    "RewardExperience": 2000,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventRoundMvp",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Get 1 MVP",
+    "AmountToComplete": 1,
+    "RewardExperience": 1000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventRoundMvp",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Get 3 MVPs",
+    "AmountToComplete": 3,
+    "RewardExperience": 1500,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventHostageRescued",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Rescue 3 hostages",
+    "AmountToComplete": 3,
+    "RewardExperience": 1000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventHostageRescued",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Rescue 8 hostages",
+    "AmountToComplete": 8,
+    "RewardExperience": 2500,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventBombDefused",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Defuse 3 bombs",
+    "AmountToComplete": 3,
+    "RewardExperience": 1500,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventBombDefused",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Defuse 8 bombs",
+    "AmountToComplete": 8,
+    "RewardExperience": 300,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Attacker",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Kill 10 players",
+    "AmountToComplete": 10,
+    "RewardExperience": 1000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Attacker",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Kill 25 players",
+    "AmountToComplete": 25,
+    "RewardExperience": 2500,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Assister",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Assist in 10 kills",
+    "AmountToComplete": 10,
+    "RewardExperience": 1000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventItemPurchase",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Purchase 30 items",
+    "AmountToComplete": 30,
+    "RewardExperience": 1500,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventGrenadeThrown",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Throw 5 grenades",
+    "AmountToComplete": 5,
+    "RewardExperience": 1000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventPlayerJump",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Jump 100 times",
+    "AmountToComplete": 100,
+    "RewardExperience": 1500,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventBreakProp",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Break 5 props",
+    "AmountToComplete": 5,
+    "RewardExperience": 2500,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventAchievementEarned",
+    "Target": "Player",
+    "EventProperties": null,
+    "Type": "Personal",
+    "Name": "Earn 1 achievement",
+    "AmountToComplete": 1,
+    "RewardExperience": 3000,
+    "BattlePassOnly": true
+  },
+  {
+    "Event": "EventPlayerDeath",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Die 10,000 times as a community",
+    "AmountToComplete": 10000,
+    "RewardExperience": 50000
+  },
+  {
+    "Event": "EventBombDefused",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Defuse 2,000 bombs as a community",
+    "AmountToComplete": 2000,
+    "RewardExperience": 40000
+  },
+  {
+    "Event": "EventHostageRescued",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Rescue 5,000 hostages as a community",
+    "AmountToComplete": 5000,
+    "RewardExperience": 45000,
+    "BattlePassOnly": false
+  },
+  {
+    "Event": "EventGrenadeThrown",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Throw 50,000 grenades as a community",
+    "AmountToComplete": 50000,
+    "RewardExperience": 70000
+  },
+  {
+    "Event": "EventWeaponReload",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Reload weapons 100,000 times as a community",
+    "AmountToComplete": 100000,
+    "RewardExperience": 50000
+  },
+  {
+    "Event": "EventPlayerJump",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Jump 500,000 times as a community",
+    "AmountToComplete": 500000,
+    "RewardExperience": 60000
+  },
+  {
+    "Event": "EventBreakProp",
+    "Target": "Userid",
+    "EventProperties": null,
+    "Type": "Community",
+    "Name": "Break 10,000 props as a community",
+    "AmountToComplete": 10000,
+    "RewardExperience": 75000
+  }
+]

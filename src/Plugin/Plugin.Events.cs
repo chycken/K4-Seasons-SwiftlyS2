@@ -13,7 +13,7 @@ public sealed partial class Plugin
 	private void RegisterEventHandlers()
 	{
 		Core.GameEvent.HookPost<EventPlayerActivate>(OnPlayerActivate);
-		Core.GameEvent.HookPost<EventPlayerDisconnect>(OnPlayerDisconnect);
+		Core.Event.OnClientDisconnected += OnClientDisconnected;
 		Core.GameEvent.HookPost<EventRoundEnd>(OnRoundEnd);
 		Core.GameEvent.HookPost<EventCsWinPanelMatch>(OnGameEnd);
 		Core.Event.OnMapLoad += OnMapLoad;
@@ -30,14 +30,12 @@ public sealed partial class Plugin
 		return HookResult.Continue;
 	}
 
-	private HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
+	private void OnClientDisconnected(IOnClientDisconnectedEvent @event)
 	{
-		var player = Core.PlayerManager.GetPlayer(@event.UserId);
+		var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
 
 		if (player != null)
 			_playerManager.RemovePlayer(player.SteamID);
-
-		return HookResult.Continue;
 	}
 
 	private HookResult OnRoundEnd(EventRoundEnd @event)

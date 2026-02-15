@@ -88,7 +88,8 @@ public sealed partial class Plugin
 
 						if (assigned > 0)
 						{
-							Core.Scheduler.NextWorldUpdate(() =>
+							// Delay longer to show AFTER welcome message (1.5s welcome + 1s gap = 2.5s)
+							Core.Scheduler.DelayBySeconds(2.5f, () =>
 							{
 								if (!player.IsValid)
 									return;
@@ -297,9 +298,16 @@ public sealed partial class Plugin
 			if (!player.IsValid)
 				return;
 
-			var localizer = Core.Translation.GetPlayerLocalizer(player.Player);
-			var command = Config.CurrentValue.Commands.Season.Command;
-			player.Player.SendChat($"{localizer["k4.general.prefix"]} {localizer["k4.chat.welcome", command]}");
+			// Delay welcome message to ensure player language is set via cl_language cvar callback
+			Core.Scheduler.DelayBySeconds(1.5f, () =>
+			{
+				if (!player.IsValid)
+					return;
+
+				var localizer = Core.Translation.GetPlayerLocalizer(player.Player);
+				var command = Config.CurrentValue.Commands.Season.Command;
+				player.Player.SendChat($"{localizer["k4.general.prefix"]} {localizer["k4.chat.welcome", command]}");
+			});
 		}
 	}
 }

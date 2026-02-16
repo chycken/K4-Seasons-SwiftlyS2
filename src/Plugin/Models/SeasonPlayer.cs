@@ -7,7 +7,7 @@ public sealed class SeasonPlayer
 	public required ulong SteamId { get; init; }
 	public required IPlayer Player { get; init; }
 
-	public string UserName => Player.Controller?.PlayerName ?? "Unknown";
+	public string UserName { get; set; } = "Unknown";
 	public long Experience { get; set; }
 	public DateTime? BattlePassPurchased { get; set; }
 	public int Streak { get; set; }

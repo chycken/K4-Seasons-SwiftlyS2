@@ -79,7 +79,10 @@ public sealed partial class Plugin
 			return result;
 		}
 
-		public async Task UpsertPlayerAsync(SeasonPlayer player)
+		public Task UpsertPlayerAsync(SeasonPlayer player) =>
+			UpsertPlayerAsync(player.ToDbPlayer());
+
+		public async Task UpsertPlayerAsync(DbPlayer dbPlayer)
 		{
 			if (!IsEnabled)
 				return;
@@ -103,12 +106,11 @@ public sealed partial class Plugin
 							streak = @Streak, prestige = @Prestige, rerolls = @Rerolls, reroll_reset_date = @RerollResetDate,
 							active_time = @ActiveTime, last_seen = @LastSeen";
 
-				var dbPlayer = player.ToDbPlayer();
 				await conn.ExecuteAsync(sql, dbPlayer);
 			}
 			catch (Exception ex)
 			{
-				Core.Logger.LogError(ex, "Failed to save player {SteamId}", player.SteamId);
+				Core.Logger.LogError(ex, "Failed to save player {SteamId}", dbPlayer.SteamId);
 			}
 		}
 

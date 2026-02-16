@@ -6,7 +6,7 @@ using SwiftlyS2.Shared.Plugins;
 
 namespace K4Seasons;
 
-[PluginMetadata(Id = "k4.seasons", Version = "1.0.1", Name = "K4 - Seasons", Author = "K4ryuu", Description = "A comprehensive battle pass and season system for Counter-Strike 2 using SwiftlyS2 framework.")]
+[PluginMetadata(Id = "k4.seasons", Version = "1.0.2", Name = "K4 - Seasons", Author = "K4ryuu", Description = "A comprehensive battle pass and season system for Counter-Strike 2 using SwiftlyS2 framework.")]
 public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 {
 	public static new ISwiftlyCore Core { get; private set; } = null!;

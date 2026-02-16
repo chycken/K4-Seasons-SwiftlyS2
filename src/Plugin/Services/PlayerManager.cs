@@ -44,7 +44,18 @@ public sealed partial class Plugin
 		public void RemovePlayer(ulong steamId)
 		{
 			if (_players.TryRemove(steamId, out var player) && player.IsLoaded)
-				Task.Run(async () => await SavePlayerAsync(player));
+			{
+				var dbPlayer = player.ToDbPlayer();
+				var missions = player.PersonalMissions.Where(m => m.Id > 0).ToList();
+
+				Task.Run(async () =>
+				{
+					await _database.UpsertPlayerAsync(dbPlayer);
+
+					foreach (var m in missions)
+						await _database.UpdateMissionAsync(m);
+				});
+			}
 		}
 
 		private async Task LoadPlayerAsync(SeasonPlayer player)
@@ -55,6 +66,7 @@ public sealed partial class Plugin
 
 				if (dbPlayer != null)
 				{
+					player.UserName = dbPlayer.UserName;
 					player.Experience = dbPlayer.Experience;
 					player.BattlePassPurchased = dbPlayer.BattlePassPurchased;
 					player.Streak = dbPlayer.Streak;
@@ -81,6 +93,8 @@ public sealed partial class Plugin
 				{
 					if (!player.IsValid)
 						return;
+
+					player.UserName = player.Player.Controller?.PlayerName ?? player.UserName;
 
 					Task.Run(async () =>
 					{

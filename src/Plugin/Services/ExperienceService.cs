@@ -7,9 +7,10 @@ namespace K4Seasons;
 
 public sealed partial class Plugin
 {
-	public sealed class ExperienceService(PlayerManager playerManager)
+	public sealed class ExperienceService(PlayerManager playerManager, Func<bool> isSeasonActive)
 	{
 		private readonly PlayerManager _playerManager = playerManager;
+		private readonly Func<bool> _isSeasonActive = isSeasonActive;
 
 		public void RegisterXpEvents()
 		{
@@ -49,6 +50,9 @@ public sealed partial class Plugin
 
 		private HookResult OnPlayerDeath(EventPlayerDeath @event)
 		{
+			if (!_isSeasonActive())
+				return HookResult.Continue;
+
 			var attacker = Core.PlayerManager.GetPlayer(@event.Attacker);
 
 			if (attacker?.IsValid == true && !attacker.IsFakeClient)
@@ -59,6 +63,9 @@ public sealed partial class Plugin
 
 		private void RewardPlayer(int userId, int baseReward)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			if (baseReward <= 0)
 				return;
 
@@ -71,9 +78,6 @@ public sealed partial class Plugin
 				if (gameRules?.WarmupPeriod == true)
 					return;
 			}
-
-			if (config.Experience.MinPlayerCount > _playerManager.ActivePlayerCount)
-				return;
 
 			var player = Core.PlayerManager.GetPlayer(userId);
 
@@ -88,12 +92,12 @@ public sealed partial class Plugin
 
 		public void RewardRoundWin(int winnerTeam)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			var config = Config.CurrentValue;
 
 			if (config.Experience.RoundWinReward <= 0)
-				return;
-
-			if (config.Experience.MinPlayerCount > _playerManager.ActivePlayerCount)
 				return;
 
 			foreach (var sp in _playerManager.AllPlayers.Where(p => p.IsValid && p.IsLoaded))
@@ -107,12 +111,12 @@ public sealed partial class Plugin
 
 		public void RewardGameWin(int winnerTeam)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			var config = Config.CurrentValue;
 
 			if (config.Experience.GameWinReward <= 0)
-				return;
-
-			if (config.Experience.MinPlayerCount > _playerManager.ActivePlayerCount)
 				return;
 
 			foreach (var sp in _playerManager.AllPlayers.Where(p => p.IsValid && p.IsLoaded))

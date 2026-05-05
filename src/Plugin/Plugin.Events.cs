@@ -43,7 +43,7 @@ public sealed partial class Plugin
 		var winner = @event.Winner;
 		_lastRoundWinner = winner;
 
-		if (winner > (int)Team.Spectator)
+		if (IsSeasonActive() && winner > (int)Team.Spectator)
 			_experienceService.RewardRoundWin(winner);
 
 		if (Config.CurrentValue.General.RoundEndSave)
@@ -60,7 +60,7 @@ public sealed partial class Plugin
 
 	private HookResult OnGameEnd(EventCsWinPanelMatch @event)
 	{
-		if (_lastRoundWinner > (int)Team.Spectator)
+		if (IsSeasonActive() && _lastRoundWinner > (int)Team.Spectator)
 			_experienceService.RewardGameWin(_lastRoundWinner);
 
 		Task.Run(async () => await _playerManager.SaveAllPlayersAsync());
@@ -155,6 +155,9 @@ public sealed partial class Plugin
 	{
 		var eventType = typeof(T).Name;
 
+		if (!IsSeasonActive())
+			return HookResult.Continue;
+
 		if (!Config.CurrentValue.Mission.RecordWarmup)
 		{
 			var gameRules = Core.EntitySystem.GetGameRules();
@@ -198,6 +201,9 @@ public sealed partial class Plugin
 
 	private void HandleRoundEndMissions<T>(T @event)
 	{
+		if (!IsSeasonActive())
+			return;
+
 		var winnerProp = typeof(T).GetProperty("Winner");
 
 		if (winnerProp == null)

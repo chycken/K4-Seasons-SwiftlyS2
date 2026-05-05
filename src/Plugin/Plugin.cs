@@ -6,7 +6,7 @@ using SwiftlyS2.Shared.Plugins;
 
 namespace K4Seasons;
 
-[PluginMetadata(Id = "k4.seasons", Version = "1.0.1", Name = "K4 - Seasons", Author = "K4ryuu", Description = "A comprehensive battle pass and season system for Counter-Strike 2 using SwiftlyS2 framework.")]
+[PluginMetadata(Id = "k4.seasons", Version = "1.0.2", Name = "K4 - Seasons", Author = "K4ryuu", Description = "A comprehensive battle pass and season system for Counter-Strike 2 using SwiftlyS2 framework.")]
 public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 {
 	public static new ISwiftlyCore Core { get; private set; } = null!;
@@ -63,6 +63,15 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 		Config = provider.GetRequiredService<IOptionsMonitor<PluginConfig>>();
 	}
 
+	private bool IsSeasonActive()
+	{
+		if (_playerManager == null)
+			return false;
+
+		var cfg = Config.CurrentValue;
+		return _playerManager.ActivePlayerCount >= cfg.Mission.MinPlayerCount;
+	}
+
 	private void InitializeServices(bool hotReload = false)
 	{
 		var config = Config.CurrentValue;
@@ -72,10 +81,10 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 		_missionLoader.LoadFromFile(Core.PluginPath);
 
 		_toplistService = new ToplistService(_database);
-		_missionService = new MissionService(_database, _missionLoader);
+		_missionService = new MissionService(_database, _missionLoader, IsSeasonActive);
 		_seasonService = new SeasonService(_database);
-		_playerManager = new PlayerManager(_database, _missionService, _seasonService, _toplistService);
-		_experienceService = new ExperienceService(_playerManager);
+		_playerManager = new PlayerManager(_database, _missionService, _seasonService, _toplistService, IsSeasonActive);
+		_experienceService = new ExperienceService(_playerManager, IsSeasonActive);
 
 		_missionService.OnPersonalMissionCompleted += HandlePersonalMissionCompleted;
 		_missionService.OnCommunityMissionCompleted += HandleCommunityMissionCompleted;
@@ -89,7 +98,6 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 			if (config.Toplist.Enabled)
 				await _toplistService.UpdateAsync();
 
-			// Hot reload: Load players AFTER database is initialized
 			if (hotReload)
 			{
 				Core.Scheduler.NextWorldUpdate(() =>
@@ -107,7 +115,6 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 			}
 		});
 
-		// Check for battle pass updates every 5 seconds with optimized single query
 		Core.Scheduler.RepeatBySeconds(5f, () =>
 		{
 			Task.Run(async () => await _playerManager.CheckBattlePassUpdatesAsync());
@@ -118,13 +125,14 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 			_tickCount++;
 			var cfg = Config.CurrentValue;
 
-			_playerManager.ProcessActiveTime();
-
-			if (cfg.Mission.MinPlayerCount <= _playerManager.ActivePlayerCount)
+			if (IsSeasonActive())
+			{
+				_playerManager.ProcessActiveTime();
 				_missionService.ProcessPlayTime(_playerManager.AllPlayers);
+				CheckAntiFrustration();
+			}
 
 			CheckPrestigeReminders();
-			CheckAntiFrustration();
 
 			if (cfg.Toplist.Enabled && _tickCount % 5 == 0)
 				Task.Run(async () => await _toplistService.UpdateAsync());
@@ -158,6 +166,9 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 	{
 		Core.Scheduler.NextWorldUpdate(() =>
 		{
+			if (!IsSeasonActive())
+				return;
+
 			if (!player.IsValid)
 				return;
 
@@ -172,6 +183,9 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 	{
 		Core.Scheduler.NextWorldUpdate(() =>
 		{
+			if (!IsSeasonActive())
+				return;
+
 			foreach (var player in _playerManager.AllPlayers.Where(p => p.IsValid && p.IsLoaded))
 			{
 				_playerManager.AddExperience(player, mission.RewardExperience);
@@ -196,7 +210,6 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 
 		player.Player.SendChat($"{localizer["k4.general.prefix"]} {localizer["k4.chat.progress", level, currentXp, nextLevelXp, multiplier.ToString("F2")]}");
 	}
-
 
 	private void CheckPrestigeReminders()
 	{
@@ -228,6 +241,9 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 
 	private void CheckAntiFrustration()
 	{
+		if (!IsSeasonActive())
+			return;
+
 		var config = Config.CurrentValue;
 
 		if (!config.AntiFrustration.Enabled)

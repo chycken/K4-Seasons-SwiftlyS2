@@ -1,13 +1,12 @@
-using Microsoft.Extensions.Logging;
-
 namespace K4Seasons;
 
 public sealed partial class Plugin
 {
-	public sealed class MissionService(DatabaseService database, MissionLoader loader)
+	public sealed class MissionService(DatabaseService database, MissionLoader loader, Func<bool> isSeasonActive)
 	{
 		private readonly DatabaseService _database = database;
 		private readonly MissionLoader _loader = loader;
+		private readonly Func<bool> _isSeasonActive = isSeasonActive;
 
 		public List<DbCommunityMission> ActiveCommunityMissions { get; } = [];
 		public string CurrentMap { get; set; } = string.Empty;
@@ -111,8 +110,11 @@ public sealed partial class Plugin
 
 		public void ProcessEvent(SeasonPlayer player, string eventType, string target, Dictionary<string, object?>? props)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			foreach (var mission in player.PersonalMissions.Where(m =>
-				m.Matches(eventType, target, CurrentMap, props)))
+				!m.Completed && m.Matches(eventType, target, CurrentMap, props)))
 			{
 				mission.Progress++;
 
@@ -121,7 +123,7 @@ public sealed partial class Plugin
 			}
 
 			foreach (var mission in ActiveCommunityMissions.Where(m =>
-				m.Matches(eventType, target, CurrentMap, props)))
+				!m.Completed && m.Matches(eventType, target, CurrentMap, props)))
 			{
 				mission.Progress++;
 
@@ -166,6 +168,9 @@ public sealed partial class Plugin
 
 		public async Task AbandonMission(SeasonPlayer player, DbMission mission, PlayerManager playerManager)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			if (mission.Completed || mission.AmountToComplete <= 0)
 				return;
 
@@ -197,6 +202,9 @@ public sealed partial class Plugin
 
 		public void ProcessPlayTime(IEnumerable<SeasonPlayer> players)
 		{
+			if (!_isSeasonActive())
+				return;
+
 			foreach (var player in players.Where(p => p.IsValid && p.IsLoaded))
 			{
 				foreach (var mission in player.PersonalMissions.Where(m =>

@@ -1,4 +1,4 @@
-<a name="readme-top"></a>
+<h1><a>FIXED ISSUE: PLUGIN DIDNT RESPECT THE MINPLAYER SETTINGS</a></h1>
 
 ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/K4ryuu/K4-Seasons-SwiftlyS2?style=for-the-badge&label=Version)
 ![GitHub Repo stars](https://img.shields.io/github/stars/K4ryuu/K4-Seasons-SwiftlyS2?style=for-the-badge)

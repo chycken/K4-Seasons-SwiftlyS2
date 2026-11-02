@@ -83,7 +83,7 @@ public sealed partial class Plugin(ISwiftlyCore core) : BasePlugin(core)
 		_toplistService = new ToplistService(_database);
 		_missionService = new MissionService(_database, _missionLoader, IsSeasonActive);
 		_seasonService = new SeasonService(_database);
-		_playerManager = new PlayerManager(_database, _missionService, _seasonService, _toplistService, IsSeasonActive);
+		_playerManager = new PlayerManager(_database, _missionService, _seasonService, _toplistService);
 		_experienceService = new ExperienceService(_playerManager, IsSeasonActive);
 
 		_missionService.OnPersonalMissionCompleted += HandlePersonalMissionCompleted;

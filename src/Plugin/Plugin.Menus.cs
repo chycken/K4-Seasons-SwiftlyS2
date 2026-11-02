@@ -1,72 +1,73 @@
-using SwiftlyS2.Core.Menus.OptionsBase;
-using SwiftlyS2.Shared.Menus;
+using SwiftlyS2.Shared.Menu;
+using SwiftlyS2.Shared.Menu.Components;
 using SwiftlyS2.Shared.Translation;
 
 namespace K4Seasons;
 
 public sealed partial class Plugin
 {
-	private void ShowMainMenu(SeasonPlayer player)
+	private static ButtonComponent CreateColoredButton(string text, string hexColor, Func<MenuActionContext, ValueTask> onSelect)
+	{
+		var btn = new ButtonComponent($"<font color='{hexColor}'>{text}</font>", onSelect)
+		{
+			MaxWidth = 0,
+			Overflow = MenuTextOverflow.None
+		};
+		return btn;
+	}
+
+	public IMenu BuildMainMenu(SeasonPlayer player)
 	{
 		var localizer = Core.Translation.GetPlayerLocalizer(player.Player);
-		var config = Config.CurrentValue;
 
-		var builder = Core.MenusAPI.CreateBuilder()
-			.Design.SetMenuTitle(localizer["k4.menu.title"])
-			.Design.SetMenuTitleVisible(true)
-			.Design.SetMenuFooterVisible(true)
-			.Design.SetGlobalScrollStyle(MenuOptionScrollStyle.LinearScroll);
+		var builder = Core.Menu.CreateMenu("k4.seasons.main")
+			.WithTitle(localizer["k4.menu.title"]);
 
-		var infoBtn = new ButtonMenuOption($"<font color='#4A90D9'>{localizer["k4.menu.info"]}</font>");
-		infoBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.info"], "#49d", _ =>
 		{
 			ShowSeasonInfo(player, localizer);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(infoBtn);
+		}));
 
-		var profileBtn = new ButtonMenuOption($"<font color='#4CAF50'>{localizer["k4.menu.profile"]}</font>");
-		profileBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.profile"], "#4a5", _ =>
 		{
 			ShowProfile(player, localizer);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(profileBtn);
+		}));
 
-		var missionsBtn = new ButtonMenuOption($"<font color='#FF9800'>{localizer["k4.menu.missions"]}</font>");
-		missionsBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.missions"], "#f90", _ =>
 		{
-			ShowMissionsMenu(player, localizer);
+			var parent = BuildMainMenu(player);
+			ShowMissionsMenu(player, localizer, parent);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(missionsBtn);
+		}));
 
-		var bpBtn = new ButtonMenuOption($"<font color='#E91E63'>{localizer["k4.menu.battlepass"]}</font>");
-		bpBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.battlepass"], "#e16", _ =>
 		{
 			ShowBattlePassInfo(player, localizer);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(bpBtn);
+		}));
 
-		var levelsBtn = new ButtonMenuOption($"<font color='#9C27B0'>{localizer["k4.menu.levels"]}</font>");
-		levelsBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.levels"], "#92b", _ =>
 		{
-			ShowLevelList(player, localizer);
+			var parent = BuildMainMenu(player);
+			ShowLevelList(player, localizer, parent);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(levelsBtn);
+		}));
 
-		var toplistBtn = new ButtonMenuOption($"<font color='#FFC107'>{localizer["k4.menu.toplist"]}</font>");
-		toplistBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.toplist"], "#fc0", _ =>
 		{
-			ShowToplist(player, localizer);
+			var parent = BuildMainMenu(player);
+			ShowToplist(player, localizer, parent);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(toplistBtn);
+		}));
 
-		var mainMenu = builder.Build();
-		Core.MenusAPI.OpenMenuForPlayer(player.Player, mainMenu);
+		return builder.Build();
+	}
+
+	private void ShowMainMenu(SeasonPlayer player)
+	{
+		BuildMainMenu(player).Open(player.Player);
 	}
 
 	private void ShowSeasonInfo(SeasonPlayer player, ILocalizer localizer)
@@ -79,7 +80,6 @@ public sealed partial class Plugin
 			var config = Config.CurrentValue;
 			var prefix = localizer["k4.general.prefix"];
 			var separator = localizer["k4.chat.separator"];
-			var seasonName = _seasonService.CurrentConfig?.SeasonName ?? $"Season {_seasonService.CurrentSeasonId}";
 			var remaining = _seasonService.SeasonEnd - DateTime.UtcNow;
 			var daysLeft = Math.Max(0, (int)remaining.TotalDays);
 
@@ -134,32 +134,27 @@ public sealed partial class Plugin
 		});
 	}
 
-	private void ShowMissionsMenu(SeasonPlayer player, ILocalizer localizer)
+	private void ShowMissionsMenu(SeasonPlayer player, ILocalizer localizer, IMenu? parentMenu = null)
 	{
-		var builder = Core.MenusAPI.CreateBuilder()
-			.Design.SetMenuTitle(localizer["k4.menu.missions"])
-			.Design.SetMenuTitleVisible(true)
-			.Design.SetMenuFooterVisible(true)
-			.Design.SetGlobalScrollStyle(MenuOptionScrollStyle.LinearScroll);
+		var builder = Core.Menu.CreateMenu("k4.seasons.missions")
+			.WithTitle(localizer["k4.menu.missions"]);
 
-		var personalBtn = new ButtonMenuOption($"<font color='#FF9800'>{localizer["k4.menu.missions_personal"]}</font>");
-		personalBtn.Click += (_, _) =>
+		if (parentMenu != null)
+			builder.WithParent(parentMenu);
+
+		builder.Add(CreateColoredButton(localizer["k4.menu.missions_personal"], "#f90", _ =>
 		{
 			ShowPersonalMissions(player, localizer);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(personalBtn);
+		}));
 
-		var communityBtn = new ButtonMenuOption($"<font color='#4CAF50'>{localizer["k4.menu.missions_community"]}</font>");
-		communityBtn.Click += (_, _) =>
+		builder.Add(CreateColoredButton(localizer["k4.menu.missions_community"], "#4a5", _ =>
 		{
 			ShowCommunityMissions(player, localizer);
 			return ValueTask.CompletedTask;
-		};
-		builder.AddOption(communityBtn);
+		}));
 
-		var menu = builder.Build();
-		Core.MenusAPI.OpenMenuForPlayer(player.Player, menu);
+		builder.Build().Open(player.Player);
 	}
 
 	private void ShowPersonalMissions(SeasonPlayer player, ILocalizer localizer)
@@ -173,17 +168,14 @@ public sealed partial class Plugin
 			var prefix = localizer["k4.general.prefix"];
 			var separator = localizer["k4.chat.separator"];
 
-			// Personal missions count
 			var completedCount = player.PersonalMissions.Count(m => m.Completed);
 			player.Player.SendChat($"{prefix} [lime]{localizer["k4.menu.missions_personal"]}: [grey]([yellow]{completedCount}[silver]/[lime]{player.PersonalMissions.Count}[grey] completed)");
 
-			// Player limit warning
 			if (_playerManager.ActivePlayerCount < config.Mission.MinPlayerCount)
 			{
 				player.Player.SendChat($" [lightred]⚠ {localizer["k4.chat.player_limit", config.Mission.MinPlayerCount]}");
 			}
 
-			// Reset time info
 			var resetInfo = GetResetTimeInfo(player, localizer);
 			if (!string.IsNullOrEmpty(resetInfo))
 			{
@@ -216,7 +208,6 @@ public sealed partial class Plugin
 					counter++;
 				}
 
-				// Locked Battle Pass slots
 				var totalSlots = config.Mission.DailyMissionCount +
 					(player.HasBattlePass ? config.BattlePass.DailyMissionCount : 0);
 				var maxSlots = config.Mission.DailyMissionCount + config.BattlePass.DailyMissionCount;
@@ -245,12 +236,10 @@ public sealed partial class Plugin
 			var prefix = localizer["k4.general.prefix"];
 			var separator = localizer["k4.chat.separator"];
 
-			// Community missions count
 			var communityCompleted = _missionService.ActiveCommunityMissions.Count(m => m.Completed);
 			var communityTotal = _missionService.ActiveCommunityMissions.Count;
 			player.Player.SendChat($"{prefix} [lime]{localizer["k4.menu.missions_community"]}: [grey]([yellow]{communityCompleted}[silver]/[lime]{communityTotal}[grey] completed)");
 
-			// Player limit warning
 			if (_playerManager.ActivePlayerCount < config.Mission.MinPlayerCount)
 			{
 				player.Player.SendChat($" [lightred]⚠ {localizer["k4.chat.player_limit", config.Mission.MinPlayerCount]}");
@@ -262,7 +251,6 @@ public sealed partial class Plugin
 			}
 			else
 			{
-
 				foreach (var cm in _missionService.ActiveCommunityMissions)
 				{
 					var status = cm.Completed ? "[lime]✔" : $"[yellow]{cm.Progress}[silver]/[lime]{cm.AmountToComplete}";
@@ -301,7 +289,7 @@ public sealed partial class Plugin
 		});
 	}
 
-	private void ShowLevelList(SeasonPlayer player, ILocalizer localizer)
+	private void ShowLevelList(SeasonPlayer player, ILocalizer localizer, IMenu? parentMenu = null)
 	{
 		var config = Config.CurrentValue;
 		var seasonConfig = _seasonService.CurrentConfig;
@@ -309,11 +297,11 @@ public sealed partial class Plugin
 		if (seasonConfig?.Rewards == null)
 			return;
 
-		var builder = Core.MenusAPI.CreateBuilder()
-			.Design.SetMenuTitle(localizer["k4.menu.levels"])
-			.Design.SetMenuTitleVisible(true)
-			.Design.SetMenuFooterVisible(true)
-			.Design.SetGlobalScrollStyle(MenuOptionScrollStyle.LinearScroll);
+		var builder = Core.Menu.CreateMenu("k4.seasons.levels")
+			.WithTitle(localizer["k4.menu.levels"]);
+
+		if (parentMenu != null)
+			builder.WithParent(parentMenu);
 
 		var currentLevel = player.GetLevel(config);
 
@@ -326,28 +314,31 @@ public sealed partial class Plugin
 			string color;
 			string statusIcon;
 
-			if (claimed) { color = "#4CAF50"; statusIcon = "✓"; }
-			else if (locked) { color = "#666666"; statusIcon = "🔒"; }
-			else if (reachable) { color = "#FFD700"; statusIcon = "★"; }
-			else { color = "#AAAAAA"; statusIcon = "○"; }
+			if (claimed) { color = "#4a5"; statusIcon = "✓"; }
+			else if (locked) { color = "#666"; statusIcon = "🔒"; }
+			else if (reachable) { color = "#fd0"; statusIcon = "★"; }
+			else { color = "#aaa"; statusIcon = "○"; }
 
-			var bpTag = reward.BattlePassOnly ? " <font color='#E91E63'>[BP]</font>" : "";
-
-			var btn = new ButtonMenuOption(
-				$"<font color='{color}'>{statusIcon} Lv.{level}{bpTag}</font>");
+			var bpTag = reward.BattlePassOnly ? " <font color='#e16'>[BP]</font>" : "";
+			var btnText = $"<font color='{color}'>{statusIcon} Lv.{level}{bpTag}</font>";
 
 			var capturedLevel = level;
 			var capturedReward = reward;
 
-			btn.Click += (_, _) =>
+			var btn = new ButtonComponent(btnText, _ =>
 			{
 				ShowLevelDetails(player, localizer, capturedLevel, capturedReward);
 				return ValueTask.CompletedTask;
+			})
+			{
+				MaxWidth = 0,
+				Overflow = MenuTextOverflow.None
 			};
-			builder.AddOption(btn);
+
+			builder.Add(btn);
 		}
 
-		Core.MenusAPI.OpenMenuForPlayer(player.Player, builder.Build());
+		builder.Build().Open(player.Player);
 	}
 
 	private static void ShowLevelDetails(SeasonPlayer player, ILocalizer localizer, int level, SeasonReward reward)
@@ -368,14 +359,12 @@ public sealed partial class Plugin
 
 			player.Player.SendChat($"{prefix} [lime]Level {level}:");
 			player.Player.SendChat($" {localizer["k4.chat.level_name", reward.Name]}");
-			// Required XP with status inline
 			var xpStatus = "";
 			if (!claimed && !locked && !reachable)
 				xpStatus = " [grey](Not Reached Yet)";
 
 			player.Player.SendChat($" [grey]> [silver]Required XP: [white]{requiredXp}{xpStatus}");
 
-			// Status
 			if (claimed)
 				player.Player.SendChat($" [grey]> [lime]✔ Reward Claimed");
 			else if (locked)
@@ -383,7 +372,6 @@ public sealed partial class Plugin
 			else if (reachable)
 				player.Player.SendChat($" [grey]> [yellow]★ Available to Claim");
 
-			// Rewards
 			if (reward.Permissions.Count > 0)
 			{
 				player.Player.SendChat($" [lightblue]Permissions:");
@@ -418,18 +406,18 @@ public sealed partial class Plugin
 		return localizer["k4.chat.reset_time", hours, minutes].ToString();
 	}
 
-	private void ShowToplist(SeasonPlayer player, ILocalizer localizer)
+	private void ShowToplist(SeasonPlayer player, ILocalizer localizer, IMenu? parentMenu = null)
 	{
 		var config = Config.CurrentValue;
 
 		if (!config.Toplist.Enabled)
 			return;
 
-		var builder = Core.MenusAPI.CreateBuilder()
-			.Design.SetMenuTitle(localizer["k4.menu.toplist"])
-			.Design.SetMenuTitleVisible(true)
-			.Design.SetMenuFooterVisible(true)
-			.Design.SetGlobalScrollStyle(MenuOptionScrollStyle.LinearScroll);
+		var builder = Core.Menu.CreateMenu("k4.seasons.toplist")
+			.WithTitle(localizer["k4.menu.toplist"]);
+
+		if (parentMenu != null)
+			builder.WithParent(parentMenu);
 
 		var toplist = _toplistService.Toplist.Values.OrderBy(e => e.Rank).Take(10).ToList();
 
@@ -437,20 +425,22 @@ public sealed partial class Plugin
 		{
 			var color = entry.Rank switch
 			{
-				1 => "#FFD700",
-				2 => "#C0C0C0",
-				3 => "#CD7F32",
-				_ => "#FFFFFF"
+				1 => "#fd0",
+				2 => "#ccc",
+				3 => "#c83",
+				_ => "#fff"
 			};
 
-			var btn = new ButtonMenuOption($"<font color='{color}'>#{entry.Rank} {entry.UserName} - {entry.Experience:N0} XP</font>");
-			btn.Click += (_, _) => ValueTask.CompletedTask;
-			builder.AddOption(btn);
+			var btn = new ButtonComponent($"<font color='{color}'>#{entry.Rank} {entry.UserName} - {entry.Experience:N0} XP</font>", _ => ValueTask.CompletedTask)
+			{
+				MaxWidth = 0,
+				Overflow = MenuTextOverflow.None
+			};
+			builder.Add(btn);
 		}
 
-		Core.MenusAPI.OpenMenuForPlayer(player.Player, builder.Build());
+		builder.Build().Open(player.Player);
 
-		// Send player's rank to chat
 		Task.Run(async () =>
 		{
 			var (rank, total) = await _database.GetPlayerRankAsync(player.SteamId);

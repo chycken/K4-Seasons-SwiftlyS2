@@ -8,7 +8,7 @@ public sealed partial class Plugin
 {
 	private static ButtonComponent CreateColoredButton(string text, string hexColor, Func<MenuActionContext, ValueTask> onSelect)
 	{
-		var btn = new ButtonComponent($"<font color='{hexColor}'>{text}</font>", onSelect)
+		var btn = new ButtonComponent(text, onSelect)
 		{
 			MaxWidth = 0,
 			Overflow = MenuTextOverflow.None
@@ -311,16 +311,15 @@ public sealed partial class Plugin
 			var locked = reward.BattlePassOnly && !player.HasBattlePass;
 			var reachable = level <= currentLevel;
 
-			string color;
 			string statusIcon;
 
-			if (claimed) { color = "#4a5"; statusIcon = "✓"; }
-			else if (locked) { color = "#666"; statusIcon = "🔒"; }
-			else if (reachable) { color = "#fd0"; statusIcon = "★"; }
-			else { color = "#aaa"; statusIcon = "○"; }
+			if (claimed) { statusIcon = "✓"; }
+			else if (locked) { statusIcon = "🔒"; }
+			else if (reachable) { statusIcon = "★"; }
+			else { statusIcon = "○"; }
 
-			var bpTag = reward.BattlePassOnly ? " <font color='#e16'>[BP]</font>" : "";
-			var btnText = $"<font color='{color}'>{statusIcon} Lv.{level}{bpTag}</font>";
+			var bpTag = reward.BattlePassOnly ? " [BP]" : "";
+			var btnText = $"{statusIcon} Lv.{level}{bpTag}";
 
 			var capturedLevel = level;
 			var capturedReward = reward;
@@ -423,15 +422,7 @@ public sealed partial class Plugin
 
 		foreach (var entry in toplist)
 		{
-			var color = entry.Rank switch
-			{
-				1 => "#fd0",
-				2 => "#ccc",
-				3 => "#c83",
-				_ => "#fff"
-			};
-
-			var btn = new ButtonComponent($"<font color='{color}'>#{entry.Rank} {entry.UserName} - {entry.Experience:N0} XP</font>", _ => ValueTask.CompletedTask)
+			var btn = new ButtonComponent($"#{entry.Rank} {entry.UserName} - {entry.Experience:N0} XP", _ => ValueTask.CompletedTask)
 			{
 				MaxWidth = 0,
 				Overflow = MenuTextOverflow.None
